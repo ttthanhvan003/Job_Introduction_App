@@ -1,0 +1,214 @@
+<!
+{% extends 'admin/base_site.html' %}
+
+{% block content %}
+
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    select {
+      margin: 10px 0;
+    }
+
+    #chartContainerQuarter, #chartContainerYear {
+      margin-top: 20px;
+    }
+
+    .year-header {
+      font-weight: bold;
+      background-color: #ddd;
+    }
+  </style>
+
+<h1>STATISTICS OF STUDENTS SUBMITTING APPLICATIONS ON THE SYSTEM</h1>
+    <h2>Statistics Table By Year and Quarter</h2>
+    <table border="1">
+
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Quarter</th>
+            <th>Job Category Name</th>
+            <th>Number of Applications</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% regroup stats by year as year_list %}
+        {% for year in year_list %}
+            {% regroup year.list by quarter as quarter_list %}
+            {% for quarter in quarter_list %}
+                {% for entry in quarter.list %}
+                    <tr>
+                        <td>{% if forloop.first %}{{ entry.year }}{% endif %}</td>
+                        <td>{% if forloop.first %}{{ entry.quarter }}{% endif %}</td>
+                        <td>{{ entry.job__category__name }}</td>
+                        <td>{{ entry.count }}</td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        {% endfor %}
+
+    </tbody>
+    </table>
+
+
+
+    <label for="selectYear">Select Year:</label>
+        <select id="selectYear" onchange="updateChart('myChartYear')">
+
+            {% regroup stats by year as year_list %}
+            {% for year in year_list %}
+                <option value="{{ year.grouper }}">{{ year.grouper }}</option>
+            {% endfor %}
+
+        </select>
+
+        <label for="selectQuarter">Select Quarter:</label>
+        <select id="selectQuarter" onchange="updateChart('myChartQuarter')">
+            {% regroup stats by quarter as quarter_list %}
+            {% for quarter in quarter_list %}
+                <option value="{{ quarter.grouper }}">{{ quarter.grouper }}</option>
+            {% endfor %}
+        </select>
+
+
+    <div id="chartContainerQuarter">
+        <h2>Chart by Quarter</h2>
+        <canvas id="myChartQuarter"></canvas>
+    </div>
+
+    <div id="chartContainerYear">
+        <h2>Chart by Year</h2>
+        <canvas id="myChartYear"></canvas>
+    </div>
+
+    <!-- Import thư viện Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script để vẽ biểu đồ -->
+    <script>
+
+<!--        let labels = [];-->
+<!--        let values = [];-->
+<!--        {% for c in stats %}-->
+<!--           values.push({{ c.count }})-->
+<!--           labels.push('{{ c.name }}')-->
+<!--        {% endfor %}-->
+
+<!--        window.onload = () => {-->
+
+<!--        }-->
+
+
+            let myChartYear, myChartQuarter;
+
+    window.onload = () => {
+        // Khởi tạo biểu đồ theo năm
+        let ctxYear = document.getElementById('myChartYear').getContext('2d');
+        myChartYear = new Chart(ctxYear, {
+            type: 'bar', // Chọn loại biểu đồ, có thể là 'bar', 'line', 'pie',...
+            data: {
+                labels: [], // Nhãn trục x
+                datasets: [{
+                    label: 'Number of Applications',
+                    data: [], // Dữ liệu
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', // Màu nền cột
+                    borderColor: 'rgba(75, 192, 192, 1)', // Màu đường viền cột
+                    borderWidth: 1 // Độ rộng đường viền cột
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        stacked: true // Cho phép xếp chồng cột trên trục x
+                    },
+                    y: {
+                        beginAtZero: true // Bắt đầu từ giá trị 0 trên trục y
+                    }
+                }
+            }
+        });
+
+        // Khởi tạo biểu đồ theo quý
+        let ctxQuarter = document.getElementById('myChartQuarter').getContext('2d');
+        myChartQuarter = new Chart(ctxQuarter, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Number of Applications',
+                    data: [],
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gọi hàm cập nhật biểu đồ khi trang web được tải
+        updateChart('myChartYear');
+        updateChart('myChartQuarter');
+    }
+
+    // Hàm cập nhật dữ liệu và vẽ lại biểu đồ
+    function updateChart(chartId) {
+        let selectedYear = document.getElementById('selectYear').value;
+        let selectedQuarter = document.getElementById('selectQuarter').value;
+
+        // Xóa dữ liệu cũ
+        myChartYear.data.labels = [];
+        myChartYear.data.datasets[0].data = [];
+
+        myChartQuarter.data.labels = [];
+        myChartQuarter.data.datasets[0].data = [];
+
+        // Lặp qua dữ liệu từ Django context stats
+        {% for c in stats %}
+            // Kiểm tra năm
+            if ('{{ c.year }}' === selectedYear) {
+                // Cập nhật biểu đồ theo năm
+                myChartYear.data.labels.push('{{ c.job__category__name }}');
+                myChartYear.data.datasets[0].data.push({{ c.count }});
+            }
+
+            // Kiểm tra năm và quý
+            if ('{{ c.year }}' === selectedYear && '{{ c.quarter }}' === selectedQuarter) {
+                // Cập nhật biểu đồ theo năm và quý
+                myChartQuarter.data.labels.push('{{ c.job__category__name }}');
+                myChartQuarter.data.datasets[0].data.push({{ c.count }});
+            }
+        {% endfor %}
+
+        // Vẽ lại biểu đồ
+        myChartYear.update();
+        myChartQuarter.update();
+    }
+
+
+    </script>
+{% endblock %}
