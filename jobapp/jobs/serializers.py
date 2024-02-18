@@ -21,6 +21,9 @@ class UserSerializer(serializers.ModelSerializer):
         data = validated_data.copy()
         user = User(**data)
         user.set_password(data['password'])
+
+        if user.role == 'employer':
+            user.is_active = False
         user.save()
 
         return user

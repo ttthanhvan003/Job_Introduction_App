@@ -74,7 +74,7 @@ class JobViewSet(BaseViewSet1, generics.ListAPIView):
             category=category,
         )
 
-        return Response(serializers.JobListingSerializer(job_listing).data, status=status.HTTP_201_CREATED)
+        return Response(serializers.JobSerializer(job_listing).data, status=status.HTTP_201_CREATED)
 
     @action(methods=['post'], url_path='tags', detail=True)
     def add_tags(self, request, pk):
@@ -91,14 +91,14 @@ class JobViewSet(BaseViewSet1, generics.ListAPIView):
                     job_listing.tags.add(tag)
                     added_tags.append(tag)
 
-        return Response(serializers.JobListingSerializer(job_listing).data, status=status.HTTP_201_CREATED)
+        return Response(serializers.JobSerializer(job_listing).data, status=status.HTTP_201_CREATED)
 
     @action(methods=['get'], url_path='search', detail=False)
     def search_job(self, request):
         keyword = request.data.get('keyword', '')
 
-        return Response(serializers.JobListingSerializer(Job.objects.filter(
-            (Q(title__icontains=keyword)) &
+        return Response(serializers.JobSerializer(Job.objects.filter(
+            (Q(title__icontains=keyword) | Q(tags__name__icontains=keyword)) &
             Q(active=True)
         ), many=True).data)
 
@@ -153,7 +153,7 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView):
         keyword = request.data.get('keyword', '')
 
         return Response(serializers.UserSerializer(User.objects.filter(
-            (Q(title__icontains=keyword) | Q(employer_id__icontains=keyword) | Q(category_id__icontains=keyword)) &
+            (Q(first_name__icontains=keyword) | Q(last_name__icontains=keyword) | Q(username__icontains=keyword)) &
             Q(role='candidate') &
             Q(is_active=True)
         ), many=True).data)

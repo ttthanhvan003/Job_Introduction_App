@@ -2,6 +2,7 @@ from urllib import request
 
 from django.contrib import admin
 from django.template.response import TemplateResponse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from .models import Category, Job, Tag, User, JobApplication
 from django import forms
@@ -54,11 +55,14 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ['display_avatar']
 
     list_display = ['pk', 'username', 'role', 'date_joined', 'is_active']
+    list_editable = ['is_active']
     ordering = ['id']
 
     def display_avatar(self, user):
         if user.avatar:
-            return mark_safe('<img src="/static/{url}" width="120" />'.format(url=user.avatar.name))
+            #return mark_safe('<img src="/static/{url}" width="120" />'.format(url=user.avatar.name))
+            cloudinary_url = f'https://res.cloudinary.com/your-cloud-name/image/upload/{user.avatar.name}'
+            return format_html('<img src="{}" width="120" />', cloudinary_url)
         return ''
 
     display_avatar.allow_tags = True
