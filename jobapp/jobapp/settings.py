@@ -162,3 +162,6 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     )
 }
+
+CLIENT_ID = "eTc5UKqQRm0ia3dzOvpfVD5Zrh2jdUUSIHgiFIJy"
+CLIENT_SECRET = "W8I9cHsLIS36K27Fa65xJk5HAmwxSG691tgMYPG1KLtPPUwH8wJodC6cID9nIXFVAjAKUJUeG7ToDYrdLkZNLOMqT3sRRK1l4XpqDDYycS7YpChV2NMqMOV1f1sR6qRY"
