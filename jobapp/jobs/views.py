@@ -12,7 +12,6 @@ from rest_framework.response import Response
 class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [perms.IsUserAdmin]
 
     @action(methods=['get'], detail=True)  # detail=True đi kèm với pk
     def jobs(self, request, pk):  # lấy danh sách các tin ứng tuyển của 1 ngành nghề (category) có id là pk
@@ -22,10 +21,6 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
 
         return Response(serializers.JobSerializer(joblistings, many=True).data)
 
-    def create(self, request):
-        c = Category.objects.create(name=request.data.get('name'))
-
-        return Response(serializers.CategorySerializer(c).data, status=status.HTTP_201_CREATED)
 
 
 
