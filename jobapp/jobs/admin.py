@@ -1,5 +1,6 @@
 from urllib import request
 
+import cloudinary
 from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
@@ -54,15 +55,14 @@ class JobAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     readonly_fields = ['display_avatar']
 
-    list_display = ['pk', 'username', 'role', 'date_joined', 'is_active']
+    list_display = ['pk', 'display_avatar', 'username', 'role', 'date_joined', 'is_active']
     list_editable = ['is_active']
     ordering = ['id']
 
     def display_avatar(self, user):
         if user.avatar:
-            #return mark_safe('<img src="/static/{url}" width="120" />'.format(url=user.avatar.name))
-            cloudinary_url = f'https://res.cloudinary.com/your-cloud-name/image/upload/{user.avatar.name}'
-            return format_html('<img src="{}" width="120" />', cloudinary_url)
+            avatar_url = user.avatar.url
+            return mark_safe('<img src="{url}" width="30" />'.format(url=avatar_url))
         return ''
 
     display_avatar.allow_tags = True
@@ -79,7 +79,8 @@ class JobApplicationAdmin(admin.ModelAdmin):
 
     def cv(self, jobapplication):
         if jobapplication.resume:
-            return mark_safe('<img src="/static/{url}" width="120" />'.format(url=jobapplication.resume.name))
+            jobapplication_url = jobapplication.resume.url
+            return mark_safe('<img src="{url}" width="30" />'.format(url=jobapplication_url))
         return ''
 
 class TagAdmin(admin.ModelAdmin):

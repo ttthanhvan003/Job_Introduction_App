@@ -149,12 +149,22 @@ INTERNAL_IPS = [
     # ...
 ]
 
+# import cloudinary
+#
+# cloudinary.config(
+#     cloud_name="daiq8cr59",
+#     api_key="526432242612972",
+#     api_secret="xFbKXPf-oTOrXWmIq__14XZYWAI"
+#
+#
+# )
+
 import cloudinary
 
 cloudinary.config(
-    cloud_name="daiq8cr59",
-    api_key="526432242612972",
-    api_secret="xFbKXPf-oTOrXWmIq__14XZYWAI"
+    cloud_name="dlbkw0kcp",
+    api_key="172235111876648",
+    api_secret="XQheMcsJiytrZzOOR8Pi9ZZhqPQ"
 )
 
 REST_FRAMEWORK = {
