@@ -13,13 +13,13 @@ class CategoryViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPI
     queryset = Category.objects.all()
     serializer_class = serializers.CategorySerializer
 
-    @action(methods=['get'], detail=True)  # detail=True đi kèm với pk
-    def jobs(self, request, pk):  # lấy danh sách các tin ứng tuyển của 1 ngành nghề (category) có id là pk
-
-        category = get_object_or_404(Category, pk=pk)
-        joblistings = Job.objects.filter(category=category, active=True).all()
-
-        return Response(serializers.JobSerializer(joblistings, many=True).data)
+    # @action(methods=['get'], detail=True)  # detail=True đi kèm với pk
+    # def jobs(self, request, pk):  # lấy danh sách các tin ứng tuyển của 1 ngành nghề (category) có id là pk
+    #
+    #     category = get_object_or_404(Category, pk=pk)
+    #     joblistings = Job.objects.filter(category=category, active=True).all()
+    #
+    #     return Response(serializers.JobSerializer(joblistings, many=True).data)
 
 
 
@@ -32,13 +32,14 @@ class BaseViewSet1(viewsets.ViewSet):
 
 class JobViewSet(BaseViewSet1, generics.ListAPIView):
     pagination_class = paginators.JobPaginator
-
+    queryset = Job.objects.all()
+    serializer_class = serializers.JobSerializer
 
     def get_queryset(self):
         queries = self.queryset
-        q = self.request.query_params.get("q")
-        if q:
-            queries = queries.filter(title__icontains=q)
+        category_id = self.request.query_params.get("category_id")
+        if category_id:
+            queries = queries.filter(category_id=category_id)
 
         return queries
 

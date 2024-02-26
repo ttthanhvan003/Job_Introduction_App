@@ -36,12 +36,14 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class JobSerializer(serializers.ModelSerializer):
     tags = TagSerializer(many=True)
+    #tags = serializers.SlugRelatedField(slug_field='name', queryset=Tag.objects.all(), many=True)
     employer = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), many=False)
-    category = serializers.SlugRelatedField(slug_field='name', queryset=Category.objects.all(), many=False)
+    #category = serializers.SlugRelatedField(slug_field='id', queryset=Category.objects.all(), many=False)
+    category_id = serializers.PrimaryKeyRelatedField(source='category', read_only=True)
 
     class Meta:
         model = Job
-        fields = '__all__'
+        fields = ['id', 'tags', 'employer', 'category_id', 'created_date', 'updated_date', 'active', 'title', 'description']
         ordering = ['-created_date']
 
 

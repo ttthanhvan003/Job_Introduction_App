@@ -16,8 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path, include
-from jobs.admin import admin_site
-
+#from jobs.admin import admin_site
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -36,9 +35,9 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', include('jobs.urls')),
-    path('admin/', admin_site.urls),
-    path("__debug__/", include("debug_toolbar.urls")),
+    path('admin/', admin.site.urls),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    path("__debug__/", include("debug_toolbar.urls")),
     re_path(r'^ckeditor/',
             include('ckeditor_uploader.urls')),
 

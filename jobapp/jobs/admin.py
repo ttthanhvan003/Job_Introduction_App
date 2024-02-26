@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from .models import Category, Job, Tag, User, JobApplication
+from .models import Category, Job, Tag, User, JobApplication, Comment, Rating
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.urls import path
@@ -87,12 +87,18 @@ class TagAdmin(admin.ModelAdmin):
     list_display = ['pk', 'name', 'created_date']
     ordering = ['id']
 
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'content', 'created_date', 'employer_id', 'candidate_id']
 
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ['pk', 'rate', 'created_date', 'employer_id', 'candidate_id']
 
-admin_site = JobAppAdminSite(name='jobapp')
+#admin_site = JobAppAdminSite(name='JobIntroductionApp')
 
-admin_site.register(Category, CategoryAdmin)
-admin_site.register(Job, JobAdmin)
-admin_site.register(Tag, TagAdmin)
-admin_site.register(User, UserAdmin)
-admin_site.register(JobApplication, JobApplicationAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Job, JobAdmin)
+admin.site.register(Tag, TagAdmin)
+admin.site.register(User, UserAdmin)
+admin.site.register(JobApplication, JobApplicationAdmin)
+admin.site.register(Comment, CommentAdmin)
+admin.site.register(Rating, RatingAdmin)

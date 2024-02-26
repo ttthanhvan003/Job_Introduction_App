@@ -187,13 +187,23 @@
         myChartQuarter.data.labels = [];
         myChartQuarter.data.datasets[0].data = [];
 
+        let existingLabelsYear = [];
+
         // Lặp qua dữ liệu từ Django context stats
         {% for c in stats %}
             // Kiểm tra năm
             if ('{{ c.year }}' === selectedYear) {
                 // Cập nhật biểu đồ theo năm
+                if (!existingLabelsYear.includes('{{ c.job__category__name }}')) {
+
+                existingLabelsYear.push('{{ c.job__category__name }}');
                 myChartYear.data.labels.push('{{ c.job__category__name }}');
                 myChartYear.data.datasets[0].data.push({{ c.count }});
+            } else {
+
+                let index = myChartYear.data.labels.indexOf('{{ c.job__category__name }}');
+                myChartYear.data.datasets[0].data[index] += {{ c.count }};
+            }
             }
 
             // Kiểm tra năm và quý
